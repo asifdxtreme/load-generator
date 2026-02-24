@@ -16,8 +16,7 @@ spec:
     spec:
       containers:
         - name: load-generator
-          image: load-generator:latest
-          imagePullPolicy: Never
+          image: asifdiatm/load-generator:latest
           ports:
             - containerPort: 8080
           resources:
