@@ -10,7 +10,6 @@ The application exposes a `/query` endpoint that performs CPU-intensive work (50
 
 - A Kubernetes cluster
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- [Go 1.22+](https://go.dev/dl/)
 
 ## Quick Start
 
@@ -24,56 +23,58 @@ cd load-generator
 ### 2. Deploy with 2 replicas
 
 ```bash
-kubectl apply -f k8s/
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
 kubectl get pods -l app=load-generator
 ```
 
 Wait for all pods to be `Running`.
 
-### 3. Port-forward the service
+### 3. Phase 1 — Load test with 2 replicas
 
 ```bash
-kubectl port-forward svc/load-generator 8080:80
-```
-
-Keep this running in a separate terminal.
-
-### 4. Phase 1 — Load test with 2 replicas
-
-```bash
-go run loadtest/main.go
+kubectl apply -f k8s/loadtest-job.yaml
+kubectl wait --for=condition=complete job/load-test --timeout=120s
+kubectl logs job/load-test
 ```
 
 Note the response times.
 
-### 5. Scale to 5 replicas
+### 4. Scale to 5 replicas
 
 ```bash
+kubectl delete job load-test
 kubectl scale deployment load-generator --replicas=5
 kubectl get pods -l app=load-generator
 ```
 
 Wait for all 5 pods to be `Running`.
 
-### 6. Phase 2 — Load test with 5 replicas
+### 5. Phase 2 — Load test with 5 replicas
 
 ```bash
-go run loadtest/main.go
+kubectl apply -f k8s/loadtest-job.yaml
+kubectl wait --for=condition=complete job/load-test --timeout=120s
+kubectl logs job/load-test
 ```
 
 Compare the results — response times should be noticeably lower with 5 replicas since the CPU-intensive work is distributed across more pods.
 
 ## Load Tester Options
 
+You can customize the load test by editing `k8s/loadtest-job.yaml`:
+
+```yaml
+command: ["load-generator", "loadtest", "-c", "10", "-url", "http://load-generator/query"]
 ```
-Usage:
-  -url string    Target URL (default "http://localhost:8080/query")
-  -c int         Number of concurrent requests (default 100)
-```
+
+| Flag   | Default                           | Description                    |
+|--------|-----------------------------------|--------------------------------|
+| `-c`   | `10`                              | Number of concurrent requests  |
+| `-url` | `http://load-generator/query`     | Target URL                     |
 
 ## Cleanup
 
 ```bash
 kubectl delete -f k8s/
-kind delete cluster
 ```

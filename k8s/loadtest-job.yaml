@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load-test
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      containers:
+        - name: load-test
+          image: asifdiatm/load-generator:latest
+          command: ["load-generator", "loadtest", "-c", "10"]
+      restartPolicy: Never
