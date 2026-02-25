@@ -8,8 +8,7 @@ The application exposes a `/query` endpoint that performs CPU-intensive work (50
 
 ## Prerequisites
 
-- A Kubernetes cluster
-- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- Sign in : https://killercoda.com/playgrounds/course/kubernetes-playgrounds --> 1.34 Two Nodes setup
 
 ## Quick Start
 
