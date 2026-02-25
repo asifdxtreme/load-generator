@@ -8,7 +8,7 @@ The application exposes a `/query` endpoint that performs CPU-intensive work (50
 
 ## Prerequisites
 
-- Sign in : https://killercoda.com/playgrounds/course/kubernetes-playgrounds --> 1.34 Two Nodes setup
+- Sign in : https://killercoda.com/playgrounds/course/kubernetes-playgrounds/two-node --> 1.34 Two Nodes setup
 
 ## Quick Start
 
